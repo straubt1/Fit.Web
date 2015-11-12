@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using Fitbit.Api;
+using Microsoft.Azure;
 
 namespace Fit.Web.Controllers
 {
@@ -10,7 +11,10 @@ namespace Fit.Web.Controllers
 
         public HomeController()
         {
-            var creds = FileParser.ParseFromFile<DataCredentials>(@"C:\Development\fitbitcreds.json");
+            var creds = (CloudConfigurationManager.GetSetting("environment") == "local")
+                ? CredentialParser.ParseFromFile(@"C:\Development\fitbitcreds.json")
+                : CredentialParser.ParseFromConfiguration();
+
             _client = new FitbitClient(creds.ConsumerKey, creds.ConsumerSecret, creds.AuthToken, creds.AuthTokenSecret);
         }
 
