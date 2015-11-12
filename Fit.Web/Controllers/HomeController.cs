@@ -7,7 +7,7 @@ namespace Fit.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private  FitbitClient _client;
+        private readonly FitbitClient _client;
 
         public HomeController()
         {
@@ -18,15 +18,17 @@ namespace Fit.Web.Controllers
             _client = new FitbitClient(creds.ConsumerKey, creds.ConsumerSecret, creds.AuthToken, creds.AuthTokenSecret);
         }
 
-        public ActionResult Index()
+        public ActionResult Index(DateTime? id = null)
         {
-            var date = DateTime.Now;
+            var date = id ?? DateTime.Now;
             var model = new Dashboard
             {
                 Date = date,
                 Activity = _client.GetDayActivity(date),
                 Profile = _client.GetUserProfile()
             };
+
+            //model.Activity.Summary
             return View("Dashboard", model);
         }
     }
