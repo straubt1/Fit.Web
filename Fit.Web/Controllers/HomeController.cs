@@ -1,30 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using Fitbit.Api;
 
 namespace Fit.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private  FitbitClient _client;
+
+        public HomeController()
+        {
+            var creds = FileParser.ParseFromFile<DataCredentials>(@"C:\Development\fitbitcreds.json");
+            _client = new FitbitClient(creds.ConsumerKey, creds.ConsumerSecret, creds.AuthToken, creds.AuthTokenSecret);
+        }
+
         public ActionResult Index()
         {
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            var date = DateTime.Now;
+            var model = new Dashboard
+            {
+                Date = date,
+                Activity = _client.GetDayActivity(date),
+                Profile = _client.GetUserProfile()
+            };
+            return View("Dashboard", model);
         }
     }
 }
